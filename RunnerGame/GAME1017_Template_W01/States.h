@@ -84,7 +84,7 @@ private:
 	std::vector<Bullet*> m_vEBullets;
 	SDL_Point m_pivot;
 
-	int score =0;
+	int score = 0;
 
 public:
 	GameState();
@@ -125,6 +125,8 @@ private:
 	Button* m_MenuBtn;
 	Sprite* m_pGameover;
 	Label* m_pEndLabel;
+
+	bool rendered = false;
 public:
 	EndState();
 	void Update();
