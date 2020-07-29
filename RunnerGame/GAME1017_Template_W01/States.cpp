@@ -80,15 +80,15 @@ void GameState::Enter()
 	int width = 1024, height = 768;
 	std::cout << "Entering GameState..." << std::endl;
 	srand((unsigned)time(NULL));
-	
+
 	/////m_pBGText = IMG_LoadTexture(Engine::Instance().GetRenderer(), "Img/background.png");
 	/////m_pSprText = IMG_LoadTexture(Engine::Instance().GetRenderer(), "Img/sprites.png");
 	m_pBGText = IMG_LoadTexture(Engine::Instance().GetRenderer(), "Img/Backgrounds.png");
 	m_pSprText = IMG_LoadTexture(Engine::Instance().GetRenderer(), "Img/Player.png");
 	m_pObsText = IMG_LoadTexture(Engine::Instance().GetRenderer(), "Img/Obstacles.png");
 
-	bgArray[0] =  Sprite({0,0,1024,768}, {0, 0, 1024, 768});
-	bgArray[1] =  Sprite({0,0,1024,768}, {1024, 0, 1024, 768});
+	bgArray[0] = Sprite({ 0,0,1024,768 }, { 0, 0, 1024, 768 });
+	bgArray[1] = Sprite({ 0,0,1024,768 }, { 1024, 0, 1024, 768 });
 
 	mgArray[0] = Sprite({ 1024,0,256,512 }, { 0, 0, 256, 512 });
 	mgArray[1] = Sprite({ 1024,0,256,512 }, { 256, 0, 256, 512 });
@@ -113,7 +113,7 @@ void GameState::Enter()
 
 	// Elapsed time initialization.
 	SDL_Color white = { 255, 255, 255, 0 };
-	m_pTimeLabel = new Label("UI", 20, 20, "Elapsed time: 0s", white);
+	m_pTimeLabel = new Label("UI", 20, 20, "Elapsed time: 0", white);
 	start = time(NULL);
 	jumping = false;
 	Engine::Instance().setJumpTime(-1);
@@ -121,16 +121,17 @@ void GameState::Enter()
 void GameState::Update()
 {
 	int timeDif;
+	std::chrono::high_resolution_clock Clock;
 
 	if (EVMA::KeyPressed(SDL_SCANCODE_P))
 		STMA::PushState(new PauseState());
 	if (EVMA::KeyPressed(SDL_SCANCODE_X))
 		STMA::PushState(new EndState());
 
-	
+
 	if (m_loseGame && m_endGame)
 	{
-		std::chrono::seconds dura(3);
+		std::chrono::milliseconds dura(1500);
 		std::this_thread::sleep_for(dura);
 		Mix_HaltMusic();
 		STMA::PushState(new EndState());
@@ -142,7 +143,7 @@ void GameState::Update()
 		STMA::PushState(new WinState());
 	}
 
-		// Scroll the backgrounds. Check if they need to snap back.
+	// Scroll the backgrounds. Check if they need to snap back.
 	for (int i = 0; i < 2; i++)
 		bgArray[i].GetDstP()->x -= BGSCROLL;
 	if (bgArray[1].GetDstP()->x <= 0)
@@ -228,24 +229,67 @@ void GameState::Update()
 		Mix_PlayChannel(-1, m_vSounds[1], 0);
 	}
 
-	EnemyUpdate();
-	CheckCollision();
-
+	if (!m_loseGame) {
+		EnemyUpdate();
+		CheckCollision();
+	}
 
 }
 
-void GameState::CheckCollision() 
+void GameState::CheckCollision()
 {
+	int player_w, player_h;
+	int enemy_w, enemy_h;
+	bool collided = false;
+
+	if (Engine::Instance().Rolling()) {
+		player_w = 64;
+		player_h = 64;
+	}
+	else {
+		player_w = 64;
+		player_h = 128;
+	}
 
 	/////SDL_Rect p = { m_player->GetDstP()->x - 100, m_player->GetDstP()->y, 100, 94 };
-	SDL_Rect p = { m_player->GetDstP()->x, m_player->GetDstP()->y, 128, 128 };
+	SDL_Rect p = { m_player->GetDstP()->x + 32, m_player->GetDstP()->y, player_w, player_h };
 	for (int i = 0; i < (int)m_vEnemies.size(); i++)
 	{
 		/////SDL_Rect e = { m_vEnemies[i]->GetDstP()->x, m_vEnemies[i]->GetDstP()->y - 40, 56, 40 };
-		SDL_Rect e = { m_vEnemies[i]->GetDstP()->x, m_vEnemies[i]->GetDstP()->y, 128, 128 };
-		if (SDL_HasIntersection(&p, &e))
+		if (m_vEnemies[i]->GetDstP()->h == 448) {
+			enemy_w = m_vEnemies[i]->GetDstP()->h;
+			enemy_h = m_vEnemies[i]->GetDstP()->w;
+		}
+		else {
+			enemy_w = m_vEnemies[i]->GetDstP()->w;
+			enemy_h = m_vEnemies[i]->GetDstP()->h;
+		}
+
+		if (m_vEnemies[i]->GetDstP()->h == 448) {
+			if (!Engine::Instance().Rolling()) {
+				if ((m_player->GetDstP()->x >= m_vEnemies[i]->GetDstP()->x - 448 && m_player->GetDstP()->x <= m_vEnemies[i]->GetDstP()->x + 0) ||
+					(m_player->GetDstP()->x + 128 >= m_vEnemies[i]->GetDstP()->x - 448 && m_player->GetDstP()->x + 128 <= m_vEnemies[i]->GetDstP()->x + 0)) {
+					collided = true;
+				}
+			}
+		}
+		else {
+			SDL_Rect e = { m_vEnemies[i]->GetDstP()->x - 128, m_vEnemies[i]->GetDstP()->y, enemy_w, enemy_h };
+			if (SDL_HasIntersection(&p, &e)) {
+				collided = true;
+			}
+		}
+
+		if (collided)
 		{
-			cout << "Enemy y = " + to_string(m_vEnemies[i]->GetDstP()->y) << endl;
+			cout << "Player x0 = " + to_string(m_player->GetDstP()->x) << endl;
+			cout << "Player x1 = " + to_string(m_player->GetDstP()->x + player_w) << endl;
+			cout << "Player y0 = " + to_string(m_player->GetDstP()->y) << endl;
+			cout << "Player y1 = " + to_string(m_player->GetDstP()->y + player_h) << endl;
+			cout << "Enemy x0 = " + to_string(m_vEnemies[i]->GetDstP()->x) << endl;
+			cout << "Enemy x1 = " + to_string(m_vEnemies[i]->GetDstP()->x + enemy_w) << endl;
+			cout << "Enemy y0 = " + to_string(m_vEnemies[i]->GetDstP()->y) << endl;
+			cout << "Enemy y1 = " + to_string(m_vEnemies[i]->GetDstP()->y + enemy_h) << endl;
 			// Game over!
 			cout << "Player goes boom!" << endl;
 			//SOMA::PlaySound("explode", 0, 1);
@@ -356,24 +400,22 @@ void GameState::Render()
 			std::this_thread::sleep_for(dura);
 		}
 	}
-	
-	else if (Engine::Instance().Rolling()) {
-		//rollFrames++;
-		//rollFrames = 0;
-		/*
-		if (rollFrames > 3) {
-			rollFrames = 0;
-		}
-		m_player->SetSrcP({ 0 + (128 * rollFrames),128,128,128 });
-		*/
-	}
+
 	else {
-		if (rollFrames > -1) {
+		if (!Engine::Instance().Rolling() && rollFrames > -1) {
 			m_player->SetSrcP({ 0,0,128,128 });
 			m_player->SetMaxSp(8);
 			m_player->SetMaxFr(8);
 			rollFrames = -1;
 		}
+	}
+	if (!m_loseGame && m_player->GetSrcP()->x > 128 * 7) {
+		cout << "Player frame x =  " + to_string(m_player->GetSrcP()->x) << endl;
+		/*
+		m_player->SetSrcP({ 0,0,128,128 });
+		m_player->SetMaxSp(8);
+		m_player->SetMaxFr(8);
+		*/
 	}
 	SDL_RenderCopyEx(Engine::Instance().GetRenderer(), m_pSprText, m_player->GetSrcP(), m_player->GetDstP(), m_player->GetAngle(), &m_pivot, SDL_FLIP_NONE);
 	/////}
@@ -390,32 +432,52 @@ void GameState::Render()
 	for (int i = 0; i < (int)m_vEnemies.size(); i++)
 	{
 		/////SDL_RenderCopyEx(Engine::Instance().GetRenderer(), m_pSprText, m_vEnemies[i]->GetSrcP(), m_vEnemies[i]->GetDstP(), -90, &m_pivot, SDL_FLIP_NONE);
-		SDL_RenderCopyEx(Engine::Instance().GetRenderer(), m_pObsText, m_vEnemies[i]->GetSrcP(), m_vEnemies[i]->GetDstP(), 0, &m_pivot, SDL_FLIP_NONE);
+		SDL_RenderCopyEx(Engine::Instance().GetRenderer(), m_pObsText, m_vEnemies[i]->GetSrcP(), m_vEnemies[i]->GetDstP(), 90, &m_pivot, SDL_FLIP_NONE);
 		//m_vEnemies[i]->Render();
 
 	}
 	// Enemy bullets.
 	for (int i = 0; i < (int)m_vEBullets.size(); i++)
 		SDL_RenderCopy(Engine::Instance().GetRenderer(), m_pSprText, m_vEBullets[i]->GetSrcP(), m_vEBullets[i]->GetDstP());
-		//m_vEBullets[i]->Render();
+	//m_vEBullets[i]->Render();
 
-	/////m_pTimeLabel->SetText("Elapsed time: " + to_string(start));
+/////m_pTimeLabel->SetText("Elapsed time: " + to_string(start));
 	m_pTimeLabel->Render();
 	if (dynamic_cast<GameState*>(STMA::GetStates().back()))
 		State::Render();
 	SDL_RenderPresent(Engine::Instance().GetRenderer());
-	m_pTimeLabel->SetText(("Elapsed time: " + to_string(time(NULL) - start) + "s").c_str());
+	m_pTimeLabel->SetText(("Elapsed time: " + to_string(time(NULL) - start) + "").c_str());
 }
 
 void GameState::EnemyUpdate()
 {
+	int enemy_x, enemy_y;
+	int enemy_w, enemy_h;
+	int enemy_pos_y;
+
+	int rnd = rand() % 2;
+
 	// Update enemy spawns.
 	if (m_iESpawn++ == m_iESpawnMax)
 	{
+		if (rnd == 0) {
+			enemy_x = 128;
+			enemy_y = 128;
+			enemy_w = 128;
+			enemy_h = 128;
+			enemy_pos_y = 384;
+		}
+		else {
+			enemy_x = 0;
+			enemy_y = 0;
+			enemy_w = 128;
+			enemy_h = 448;
+			enemy_pos_y = 320;
+		}
 		/////m_vEnemies.push_back(new Enemy({ 0,100,40,56 }, { WIDTH,56 + rand() % (HEIGHT - 114),40,56 }, &m_vEBullets, m_vSounds[0], 30 + rand() % 91)); // Randomizing enemy bullet spawn to every 30-120 frames.
-		m_vEnemies.push_back(new Enemy({ 128,128,128,128 }, { WIDTH,384,128,128 }, &m_vEBullets, m_vSounds[0], 30 + rand() % 91)); // Randomizing enemy bullet spawn to every 30-120 frames.
+		m_vEnemies.push_back(new Enemy({ enemy_x,enemy_y,enemy_w,enemy_h }, { WIDTH + enemy_h,enemy_pos_y,enemy_w,enemy_h }, &m_vEBullets, m_vSounds[0], 30 + rand() % 91)); // Randomizing enemy bullet spawn to every 30-120 frames.
 		m_iESpawn = 0;
-		m_iESpawnMax = 120 + rand() % 481;
+		m_iESpawnMax = (160 * (rnd + 1)) + rand() % 481;
 		cout << "Spawn Max = " + to_string(m_iESpawnMax) << endl;
 	}
 	// Update the bullets. Player's first.
@@ -457,7 +519,7 @@ void GameState::Exit()
 	//Mix_CloseAudio();
 }
 
-void GameState::Resume(){}
+void GameState::Resume() {}
 // end title state
 
 // begin title state
@@ -466,7 +528,7 @@ TitleState::TitleState() {}
 void TitleState::Enter()
 {
 	SDL_Color white = { 0, 255, 255, 0 };
-	m_pStartLabel = new Label("UI", 280, 40, "RUNNER GAME", white);
+	m_pStartLabel = new Label("UI", 320, 40, "RUNNER GAME", white);
 	m_playBtn = new PlayButton({ 0,0,480,480 }, { 360,230,300,300 }, Engine::Instance().GetRenderer(), TEMA::GetTexture("start"));
 	m_pGameStart = new Sprite({ 0,0, 1024, 768 }, { 0,0,1024, 768 }, Engine::Instance().GetRenderer(), TEMA::GetTexture("StartScene"));
 	SOMA::Load("Aud/SpaceSprinkles.mp3", "SpaceStart", SOUND_MUSIC);
@@ -510,7 +572,7 @@ GameState& GameState::Instance()
 
 
 // begin end-state
-EndState::EndState(){}
+EndState::EndState() {}
 
 void EndState::Update()
 {
@@ -523,7 +585,10 @@ void EndState::Update()
 void EndState::Render()
 {
 	// Tile-specific rendering. Write to back buffer
-	std::cout << "Rendering EndState..." << std::endl;
+	if (!rendered) {
+		std::cout << "Rendering EndState..." << std::endl;
+		rendered = true;
+	}
 	SDL_SetRenderDrawColor(Engine::Instance().GetRenderer(), 255, 0, 0, 255);
 	SDL_RenderClear(Engine::Instance().GetRenderer());
 	m_pGameover->Render();
