@@ -195,11 +195,12 @@ void GameState::Update()
 	if (EVMA::KeyHeld(SDL_SCANCODE_D) && m_player->GetDstP()->x < WIDTH / 2)
 		m_player->GetDstP()->x += PSPEED;
 
-	if (EVMA::KeyHeld(SDL_SCANCODE_S)) {
+	if (EVMA::KeyHeld(SDL_SCANCODE_S)) 
+	{
 		if (!Engine::Instance().Rolling()) {
 			Engine::Instance().Rolling() = true;
 			rollFrames = 0;
-			//m_player->Animate();	
+
 		}
 		else {
 			rollFrames++;
@@ -212,12 +213,7 @@ void GameState::Update()
 		m_player->SetMaxFr(4);
 		cout << "Rolling..." << endl;
 	}
-	else
-	{
-		m_player->SetMaxSp(8);
-		m_player->SetMaxFr(8);
-		//m_player->Animate();
-	}
+
 
 	if (EVMA::KeyPressed(SDL_SCANCODE_SPACE) && Engine::Instance().getCanShoot()) {
 		/////
