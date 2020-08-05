@@ -40,6 +40,8 @@ void PauseState::Update()
 		STMA::GetStates().pop_back();
 	if (m_ResumeBtn->Update() == 1)
 		return;
+	//if (m_ExitBtn->Update() == 1)
+	//	return;
 
 }
 
@@ -52,6 +54,7 @@ void PauseState::Render()
 	SDL_Rect rect = { 256, 128, 512, 512 };
 	SDL_RenderFillRect(Engine::Instance().GetRenderer(), &rect);
 	m_ResumeBtn->Render();
+	m_ExitBtn->Render();
 	State::Render();
 }
 
@@ -59,6 +62,7 @@ void PauseState::Enter()
 {
 	std::cout << "Entering Pause..." << std::endl;
 	m_ResumeBtn = new ResumeButton({ 0,0,480,480 }, { 360,230,300,300 }, Engine::Instance().GetRenderer(), TEMA::GetTexture("resume"));
+	m_ExitBtn = new ExitButton({ 0,0,480,480 }, { 360,350,300,300 }, Engine::Instance().GetRenderer(), TEMA::GetTexture("exit"));
 
 }
 
@@ -99,7 +103,6 @@ void GameState::Enter()
 	fgArray[0] = Sprite({ 1024,512,512,256 }, { 0, 512, 512, 256 });
 	fgArray[1] = Sprite({ 1024,512,512,256 }, { 512, 512, 512, 256 });
 	fgArray[2] = Sprite({ 1024,512,512,256 }, { 1024, 512, 512, 256 });
-
 
 	/////m_player = new Player({ 0,0,94,100 }, { 256,384 - 50,94,100 });
 	m_player = new Player({ 0,0,128,128 }, { 256,384,128,128 });
@@ -533,6 +536,7 @@ void TitleState::Enter()
 	SDL_Color white = { 0, 255, 255, 0 };
 	m_pStartLabel = new Label("UI", 320, 40, "RUNNER GAME", white);
 	m_playBtn = new PlayButton({ 0,0,480,480 }, { 360,230,300,300 }, Engine::Instance().GetRenderer(), TEMA::GetTexture("start"));
+	m_exitBtn = new ExitButton({ 0,0,480,480 }, { 360,370,300,300 }, Engine::Instance().GetRenderer(), TEMA::GetTexture("exit"));
 	m_pGameStart = new Sprite({ 0,0, 1024, 768 }, { 0,0,1024, 768 }, Engine::Instance().GetRenderer(), TEMA::GetTexture("StartScene"));
 	SOMA::Load("Aud/SpaceSprinkles.mp3", "SpaceStart", SOUND_MUSIC);
 	SOMA::PlayMusic("SpaceStart", -1, 3000);
@@ -542,6 +546,9 @@ void TitleState::Update()
 {
 	if (m_playBtn->Update() == 1)
 		return;
+	//if (m_exitBtn->Update() == 1)
+	//	return;
+
 
 }
 
@@ -556,6 +563,7 @@ void TitleState::Render()
 	m_pStartLabel->Render();
 
 	m_playBtn->Render();
+	m_exitBtn->Render();
 	State::Render();
 
 }

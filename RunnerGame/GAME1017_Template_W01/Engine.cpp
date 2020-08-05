@@ -64,6 +64,7 @@ bool Engine::Init(const char* title, int xpos, int ypos, int width, int height, 
 	TEMA::RegisterTexture("Img/menu.png", "menu");
 	TEMA::RegisterTexture("Img/resume.png", "resume");
 	TEMA::RegisterTexture("Img/start.png", "start");
+	TEMA::RegisterTexture("Img/exit.png", "exit");
 	STMA::ChangeState(new TitleState);
 
 	m_running = true; // Everything is okay, start the engine.

@@ -32,6 +32,7 @@ class PauseState : public State
 {
 private:
 	Button* m_ResumeBtn;
+	Button* m_ExitBtn;
 public:
 	PauseState();
 	void Update();
@@ -113,6 +114,7 @@ public:
 	void Exit();
 private:
 	Button* m_playBtn;
+	Button* m_exitBtn;
 	Sprite* m_pGameStart;
 
 	Label* m_pStartLabel;
