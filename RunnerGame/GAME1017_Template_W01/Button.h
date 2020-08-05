@@ -5,6 +5,7 @@
 #include "Sprite.h"
 #include <SDL.h>
 
+
 // Button will be an example of the command design pattern.
 class Button : public Sprite
 {
@@ -44,5 +45,13 @@ private:
 	void Execute();
 public:
 	MenuButton(SDL_Rect src, SDL_Rect dst, SDL_Renderer* r, SDL_Texture* t);
+};
+
+class ExitButton : public Button
+{
+private:
+	void Execute();
+public:
+	ExitButton(SDL_Rect src, SDL_Rect dst, SDL_Renderer* r, SDL_Texture* t);
 };
 #endif

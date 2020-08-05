@@ -69,6 +69,12 @@ void ResumeButton::Execute()
 	STMA::GetStates().pop_back();
 }
 
+ExitButton::ExitButton(SDL_Rect src, SDL_Rect dst, SDL_Renderer* r, SDL_Texture* t) :Button(src, dst, r, t) {}
+void ExitButton::Execute()
+{
+	Engine::Instance().Running() = false;
+}
+
 MenuButton::MenuButton(SDL_Rect src, SDL_Rect dst, SDL_Renderer* r, SDL_Texture* t) :Button(src, dst, r, t) {}
 void MenuButton::Execute()
 {
