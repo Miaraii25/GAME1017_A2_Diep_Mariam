@@ -172,6 +172,7 @@ void GameState::Update()
 		fgArray[2].GetDstP()->x = 1024;
 	}
 
+
 	if (jumping) {
 		timeDif = time(NULL) - (Engine::Instance().getJumpTime());
 		if (timeDif >= 2) {
@@ -186,14 +187,19 @@ void GameState::Update()
 		// Player animation/movement.
 		m_player->Animate(); // Oh! We're telling the player to animate itself. This is good! Hint hint.
 	}
+	//m_player->Animate();
+	
 	if (EVMA::KeyHeld(SDL_SCANCODE_A) && m_player->GetDstP()->x > m_player->GetDstP()->h)
 		m_player->GetDstP()->x -= PSPEED;
-	else if (EVMA::KeyHeld(SDL_SCANCODE_D) && m_player->GetDstP()->x < WIDTH / 2)
+
+	if (EVMA::KeyHeld(SDL_SCANCODE_D) && m_player->GetDstP()->x < WIDTH / 2)
 		m_player->GetDstP()->x += PSPEED;
-	else if (EVMA::KeyHeld(SDL_SCANCODE_S)) {
+
+	if (EVMA::KeyHeld(SDL_SCANCODE_S)) {
 		if (!Engine::Instance().Rolling()) {
 			Engine::Instance().Rolling() = true;
 			rollFrames = 0;
+			//m_player->Animate();	
 		}
 		else {
 			rollFrames++;
@@ -206,13 +212,13 @@ void GameState::Update()
 		m_player->SetMaxFr(4);
 		cout << "Rolling..." << endl;
 	}
+	else
+	{
+		m_player->SetMaxSp(8);
+		m_player->SetMaxFr(8);
+		//m_player->Animate();
+	}
 
-	/*
-	if (EVMA::KeyHeld(SDL_SCANCODE_W) && m_player->GetDstP()->y > 0)
-		m_player->GetDstP()->y -= PSPEED;
-	else if (EVMA::KeyHeld(SDL_SCANCODE_S) && m_player->GetDstP()->y < HEIGHT - m_player->GetDstP()->w)
-		m_player->GetDstP()->y += PSPEED;
-	*/
 	if (EVMA::KeyPressed(SDL_SCANCODE_SPACE) && Engine::Instance().getCanShoot()) {
 		/////
 		/*
@@ -466,6 +472,7 @@ void GameState::EnemyUpdate()
 			enemy_w = 128;
 			enemy_h = 128;
 			enemy_pos_y = 384;
+
 		}
 		else {
 			enemy_x = 0;
