@@ -19,34 +19,55 @@ bool Button::MouseCollision()
 int Button::Update()
 {
 	bool col = MouseCollision();
+	
 	switch (m_state)
 	{
 	case STATE_UP:
-	/*	if (col)   
+	/*	if (col)
 			m_state = STATE_OVER;*/
 		if (col && EVMA::MousePressed(1)) // 1 = left, 2 = middle, 3 = right
-			Execute();
-		break;
-	case STATE_OVER:
-		if (!col)
-			m_state = STATE_UP;
-		if (col && EVMA::MousePressed(1)) // 1 = left, 2 = middle, 3 = right
-			m_state = STATE_DOWN;
-		break;
-	case STATE_DOWN:
-		if (EVMA::MouseReleased(1))
 		{
-			if (col)
-			{
-				m_state = STATE_OVER;
-				// Execute new "callback".
-				Execute();
-				return 1;
-			}
-			else 
-				m_state = STATE_UP;
+		if (col)
+		{
+			//m_state = STATE_OVER;
+			// Execute new "callback".
+			Execute();
+			return 1;
+		}
+		else
+			m_state = STATE_UP;
 		}
 		break;
+	//case STATE_OVER:
+	//	if (!col)
+	//		m_state = STATE_UP;
+	//	else if (col && EVMA::MousePressed(1)) // 1 = left, 2 = middle, 3 = right
+	//	{
+	//		if (col)
+	//		{
+	//			m_state = STATE_OVER;
+	//			// Execute new "callback".
+	//			Execute();
+	//			return 1;
+	//		}
+	//		else
+	//			m_state = STATE_UP;
+	//	}
+		//break;
+	//case STATE_DOWN:
+	//	if (EVMA::MouseReleased(1))
+	//	{
+	//		if (col)
+	//		{
+	//			m_state = STATE_OVER;
+	//			// Execute new "callback".
+	//			Execute();
+	//			return 1;
+	//		}
+	//		else
+	//			m_state = STATE_UP;
+	//	}
+	//	break;
 	}
 	return 0;
 }
