@@ -40,8 +40,8 @@ void PauseState::Update()
 		STMA::GetStates().pop_back();
 	if (m_ResumeBtn->Update() == 1)
 		return;
-	//if (m_ExitBtn->Update() == 1)
-	//	return;
+	if (m_ExitBtn->Update() == 1)
+		return;
 
 }
 
@@ -62,7 +62,7 @@ void PauseState::Enter()
 {
 	std::cout << "Entering Pause..." << std::endl;
 	m_ResumeBtn = new ResumeButton({ 0,0,480,480 }, { 360,230,300,300 }, Engine::Instance().GetRenderer(), TEMA::GetTexture("resume"));
-	m_ExitBtn = new ExitButton({ 0,0,480,480 }, { 360,350,300,300 }, Engine::Instance().GetRenderer(), TEMA::GetTexture("exit"));
+	m_ExitBtn = new ExitButton({ 0,0,480,480 }, { 360,430,300,300 }, Engine::Instance().GetRenderer(), TEMA::GetTexture("exit"));
 
 }
 
@@ -536,7 +536,7 @@ void TitleState::Enter()
 	SDL_Color white = { 0, 255, 255, 0 };
 	m_pStartLabel = new Label("UI", 320, 40, "RUNNER GAME", white);
 	m_playBtn = new PlayButton({ 0,0,480,480 }, { 360,230,300,300 }, Engine::Instance().GetRenderer(), TEMA::GetTexture("start"));
-	m_exitBtn = new ExitButton({ 0,0,480,480 }, { 360,370,300,300 }, Engine::Instance().GetRenderer(), TEMA::GetTexture("exit"));
+	m_exitBtn = new ExitButton({ 0,0,480,480 }, { 360,430,300,300 }, Engine::Instance().GetRenderer(), TEMA::GetTexture("exit"));
 	m_pGameStart = new Sprite({ 0,0, 1024, 768 }, { 0,0,1024, 768 }, Engine::Instance().GetRenderer(), TEMA::GetTexture("StartScene"));
 	SOMA::Load("Aud/SpaceSprinkles.mp3", "SpaceStart", SOUND_MUSIC);
 	SOMA::PlayMusic("SpaceStart", -1, 3000);
@@ -546,8 +546,8 @@ void TitleState::Update()
 {
 	if (m_playBtn->Update() == 1)
 		return;
-	//if (m_exitBtn->Update() == 1)
-	//	return;
+	if (m_exitBtn->Update() == 1)
+		return;
 
 
 }
